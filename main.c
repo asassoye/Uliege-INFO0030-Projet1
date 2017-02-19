@@ -5,7 +5,7 @@
  * de fichiers pnm.
  *
  * @author: Sassoye Andrew 20160315
- * @date: 23 Fevrier 2017
+ * @date:
  * @projet: INFO0030 Projet 1
  */
 
@@ -20,7 +20,32 @@
 
 
 int main(int argc, char *argv[]) {
-    
+
+    const char *optstring = ":hf::";
+    int val;
+
+    while(EOF != (val=getopt(argc, argv, optstring))){
+        switch (val){
+            case 'h':
+                printf("Help\n");
+                return 0;
+            case 'f':
+                printf("Format: %s\n", optarg);
+                return 0;
+            case '?':
+                printf("Unknown option: %c\n", optopt);
+                return 0;
+            case ':':
+                printf("Missing argument: %c\n", optopt);
+                return 0;
+            default:
+
+                return 0;
+        } //end switch
+    } //end while
+
+
+
     return 0;
 }
 
