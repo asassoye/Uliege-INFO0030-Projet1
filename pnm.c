@@ -11,9 +11,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <string.h>
 
 #include "pnm.h"
+#include "verifications.h"
 
 
 /**
@@ -21,17 +22,40 @@
  *
  */
 struct PNM_t {
-    enum {PBM, PGM, PPM} type;
-    unsigned int width, height;
+    enum{PBM, PGM, PPM} format;
+    unsigned short width;
+    unsigned short height;
+    unsigned short max_value;
+    unsigned short *pixel;
 
 };
 
 
 int load_pnm(PNM **image, char* filename) {
 
-   /* Insérez le code ici */
+    char *extension = get_extension(filename);
 
-   return 0;
+    if(extension == NULL){
+        return -2;
+    }
+
+    *image = malloc(sizeof(PNM)*1000000000000000000);
+
+    if(*image == NULL){
+        printf("COUCOU\n");
+    }
+
+    (*image)->width = 100;
+
+    printf("size:%zu\n", sizeof(PNM));
+
+    FILE *file = fopen(filename, "r");
+    if(file == NULL){
+        printf("Impossible to load %s\n", filename);
+        return -2;
+    }
+
+    return 0;
 }
 
 int write_pnm(PNM *image, char* filename) {

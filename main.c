@@ -25,6 +25,10 @@ int main(int argc, char **argv) {
     const char *optstring = ":hf::";
     int option;
 
+    PNM *image = NULL;
+
+    load_pnm(&image, "test.htm");
+    return 0;
 
     while (EOF != (option = getopt(argc, argv, optstring))) {
         switch (option) {

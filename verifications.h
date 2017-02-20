@@ -5,7 +5,7 @@
 #ifndef __VERIFICATIONS_H__
 #define __VERIFICATIONS_H__
 
-int verifie_type(char *type, char *file);
+int verify_type(char *type, char *file);
 
 char *get_extension(char *file);
 

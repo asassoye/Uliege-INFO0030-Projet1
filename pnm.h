@@ -44,6 +44,7 @@ typedef struct PNM_t PNM;
  */
 int load_pnm(PNM **image, char* filename);
 
+
 /**
  * write_pnm
  *
