@@ -63,5 +63,15 @@ int load_pnm(PNM **image, char* filename);
  */
 int write_pnm(PNM *image, char* filename);
 
+/**
+ * help_pnm
+ *
+ * Donne les instructions pour la manipulation du programme.
+ *
+ * @pre: /
+ * @post: Affiche les instructions
+ */
+void help_pnm();
+
 #endif // __PNM__
 

@@ -17,20 +17,23 @@
 #include <getopt.h>
 
 #include "pnm.h"
+#include "verifications.h"
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char **argv) {
 
     const char *optstring = ":hf::";
-    int val;
+    int option;
 
-    while(EOF != (val=getopt(argc, argv, optstring))){
-        switch (val){
+
+    while (EOF != (option = getopt(argc, argv, optstring))) {
+        switch (option) {
             case 'h':
-                printf("Help\n");
+                help_pnm();
                 return 0;
             case 'f':
                 printf("Format: %s\n", optarg);
+
                 return 0;
             case '?':
                 printf("Unknown option: %c\n", optopt);
@@ -39,13 +42,10 @@ int main(int argc, char *argv[]) {
                 printf("Missing argument: %c\n", optopt);
                 return 0;
             default:
-
+                help_pnm();
                 return 0;
         } //end switch
     } //end while
 
-
-
     return 0;
 }
-

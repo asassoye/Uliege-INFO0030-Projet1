@@ -3,5 +3,5 @@ project(INFO0030)
 
 set(CMAKE_C_STANDARD 99)
 
-set(SOURCE_FILES main.c pnm.c)
+set(SOURCE_FILES main.c pnm.c verifications.c verifications.h)
 add_executable(INFO0030 ${SOURCE_FILES})

@@ -4,7 +4,7 @@
  * Ce fichier contient les définitions de types et 
  * les fonctions de manipulation d'images PNM.
  * 
- * @author: Nom Prenom Matricule
+ * @author: Sassoye Andrew 20160135
  * @date: 
  * @projet: INFO0030 Projet 1
  */
@@ -21,8 +21,8 @@
  *
  */
 struct PNM_t {
-
-   /* Insérez ici les champs de la structure PNM */
+    enum {PBM, PGM, PPM} type;
+    unsigned int width, height;
 
 };
 
@@ -41,3 +41,8 @@ int write_pnm(PNM *image, char* filename) {
    return 0;
 }
 
+
+void help_pnm(){
+    printf("-h for help\n"
+                   "-f choose format\n");
+}
