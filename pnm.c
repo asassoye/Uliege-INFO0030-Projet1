@@ -25,10 +25,20 @@ struct PNM_t {
     enum{PBM, PGM, PPM} format;
     unsigned short width;
     unsigned short height;
-    unsigned short max_value;
-    unsigned short *pixel;
+    unsigned short limits;
+
+    union{
+        unsigned short pixel;
+        struct RGB_t{
+            unsigned short red;
+            unsigned short green;
+            unsigned short blue;
+        }pixelRGB;
+    }**matrice;
 
 };
+
+
 
 
 int load_pnm(PNM **image, char* filename) {
@@ -39,13 +49,13 @@ int load_pnm(PNM **image, char* filename) {
         return -2;
     }
 
-    *image = malloc(sizeof(PNM)*1000000000000000000);
+    *image = malloc(sizeof(PNM));
 
     if(*image == NULL){
         printf("COUCOU\n");
     }
 
-    (*image)->width = 100;
+    (*image)->format = 2;
 
     printf("size:%zu\n", sizeof(PNM));
 

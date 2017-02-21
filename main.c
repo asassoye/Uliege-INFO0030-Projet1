@@ -27,8 +27,9 @@ int main(int argc, char **argv) {
 
     PNM *image = NULL;
 
-    load_pnm(&image, "test.htm");
-    return 0;
+    load_pnm(&image, "test.pgm");
+
+
 
     while (EOF != (option = getopt(argc, argv, optstring))) {
         switch (option) {
@@ -37,7 +38,7 @@ int main(int argc, char **argv) {
                 return 0;
             case 'f':
                 printf("Format: %s\n", optarg);
-
+                printf("fichier: %s", argv[argc-1]);
                 return 0;
             case '?':
                 printf("Unknown option: %c\n", optopt);
