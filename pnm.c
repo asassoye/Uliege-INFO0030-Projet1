@@ -22,34 +22,55 @@
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 #endif
 
 /**
+ * Déclaration du type opaque RGB
+ *
+ */
+typedef struct RGB_t RGB;
+
+/**
+ * Déclaration du type opaque Pixel
+ *
+ */
+typedef struct Pixel_t Pixel;
+
+/**
+ * Déclaration du type opaque Format
+ *
+ */
+typedef enum Format_t Format;
+
+
+/**
  * Definition du type RGB
  */
-typedef struct RGB_t {
+static struct RGB_t {
     unsigned short red;
     unsigned short green;
     unsigned short blue;
-} RGB;
+};
 
 /**
- * Definition du type ImageMatrix
+ * Definition du type Pixel
  */
-typedef struct Pixel_t {
+static struct Pixel_t {
     union {
         unsigned short pixel;
         RGB pixel_rgb;
     };
-} Pixel;
+};
 
-typedef enum Format_t {
+/**
+ * Definition du type Format
+ */
+static enum Format_t {
     PBM, PGM, PPM
-} Format;
+};
 
 /**
  * Définition du type opaque PNM

@@ -5,8 +5,19 @@
 #ifndef __ERROR_H__
 #define __ERROR_H__
 
+/**
+ * error
+ *
+ * Affiche une erreur a l'ecran et retourne la valeur de l'erreur.
+ *
+ * @param code erreur (entier)
+ *
+ * @pre: code != NULL
+ * @post: Affiche l'erreur a l'ecran
+ *
+ * @return: entier erreur definit par le prof
+ *
+ */
 int error(int code);
-
-void error_print(char *error);
 
 #endif //__ERROR_H__

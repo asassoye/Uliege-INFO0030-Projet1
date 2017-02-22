@@ -24,7 +24,6 @@
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
@@ -37,7 +36,7 @@ int main(int argc, char **argv) {
 
     PNM *image = NULL;
 
-    printf(ANSI_COLOR_GREEN "\n\nPNM " ANSI_COLOR_RESET "v1 created by " ANSI_COLOR_CYAN "Andrew Sassoye\n\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_GREEN "\nPNM " ANSI_COLOR_RESET "v1 created by " ANSI_COLOR_CYAN "Andrew Sassoye\n\n" ANSI_COLOR_RESET);
 
     while (EOF != (option = getopt(argc, argv, optstring))) {
         switch (option) {

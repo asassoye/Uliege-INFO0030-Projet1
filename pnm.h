@@ -16,6 +16,8 @@
 #ifndef __PNM__
 #define __PNM__
 
+
+
 /**
  * Déclaration du type opaque PNM
  *

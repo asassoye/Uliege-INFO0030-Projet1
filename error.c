@@ -1,8 +1,15 @@
-//
-// Created by Andrew Sassoye on 22/02/17.
-//
+/**
+ * error.c
+ *
+ * Ce fichier contient les code erreurs et leurs valeurs de retour
+ *
+ * @author: Sassoye Andrew 20160135
+ * @date: 23/02/2017
+ * @projet: INFO0030 Projet 1
+ */
+
 #include <stdio.h>
-#include <stdlib.h>
+#include <assert.h>
 #include "error.h"
 
 
@@ -11,12 +18,29 @@
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 #endif
 
+/**
+ * error_print
+ *
+ * Affiche un message formaté a l'ecran
+ *
+ * @param message, pointeur sur char
+ *
+ * @pre: error != NULL
+ * @post: Affiche l'erreur formaté a l'ecran
+ *
+ * @return: message a afficher
+ *
+ */
+static void error_print(char *error);
+
 int error(int code){
+    assert(code != NULL);
+
     switch(code){
         case 0x7CC:
             error_print("Error 0x7CC: Your import file must have PBM, PGM or PPM extension!");
@@ -29,7 +53,7 @@ int error(int code){
             return -2;
         case 0x7CF:
             error_print("Error 0x7CF: Your file is corrupted!");
-            return -3; //Le fichier est malforme
+            return -3;
         case 0x7D0:
             error_print("Error 0x7D0: Your export file must have PBM, PGM or PPM extension!");
             return -1;
@@ -45,6 +69,7 @@ int error(int code){
     }
 }
 
-void error_print(char *error){
+static void error_print(char *error){
+    assert(error != NULL);
     printf(ANSI_COLOR_RED "%s\n\n" ANSI_COLOR_RESET, error);
 }
