@@ -14,11 +14,11 @@ char *get_extension(char *file){
      * Check if there is an extension and returns his type (if is PBM, PGM or PPM file)
      */
     if(extension != NULL && strlen(extension) != 1){
-        if(strcmp(extension, ".PBM")){
+        if(strcmp(extension, ".PBM") == 0 || strcmp(extension, ".pbm") == 0){
             return "PBM";
-        }else if(strcmp(extension, ".PGM")){
+        }else if(strcmp(extension, ".PGM") == 0 || strcmp(extension, ".pgm") == 0){
             return "PGM";
-        }else if(strcmp(extension, ".PPM")){
+        }else if(strcmp(extension, ".PPM") == 0 || strcmp(extension, ".ppm") == 0){
             return "PPM";
         }else {
             printf("Error: Your file must have PBM, PGM or PPM extension!");

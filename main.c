@@ -28,7 +28,10 @@ int main(int argc, char **argv) {
 
     PNM *image = NULL;
 
-    load_pnm(&image, "read.pbm");
+    if(load_pnm(&image, "read.ppm") != 0){
+        return -1;
+    }
+    write_pnm(image, "write.ppm");
 
 
 

@@ -60,6 +60,7 @@ int load_pnm(PNM **image, char *filename) {
         return -2;
     }
 
+    printf("%s", extension);
     *image = malloc(sizeof(PNM));
 
     /*
@@ -79,6 +80,7 @@ int load_pnm(PNM **image, char *filename) {
         printf("Impossible to load %s\n", filename);
         return -2;
     }
+
     if (strcmp(extension, "PBM") == 0) {
         (*image)->format = PBM; //On donne le format PBM a la structure
 
@@ -123,8 +125,125 @@ int load_pnm(PNM **image, char *filename) {
 
 
 
-    }
+    }else if (strcmp(extension, "PGM") == 0) {
 
+        (*image)->format = PGM; //On donne le format PGM a la structure
+
+        char magical[3];
+
+        if (fscanf(file, "%s", magical) != 1) {
+            return -3; //Le fichier est malforme
+        }
+
+        if (strcmp(magical, "P2") != 0) {
+            printf("Error: Your file is corrupted! (magical)");
+            return -3; //Le fichier est malforme
+        }
+
+
+
+        if (fscanf(file, "%hu %hu", &(*image)->height, &(*image)->width) != 2) {
+            printf("Error: Your file is corrupted (size)");
+            return -3; //Le fichier est malforme
+        }
+
+        if (fscanf(file, "%hu", &(*image)->limits) != 1) {
+            printf("Error: Your file is corrupted (limits)");
+            return -3; //Le fichier est malforme
+        }
+
+        (*image)->matrix = malloc(sizeof(*(*image)->matrix) * (*image)->height);
+
+        if ((*image)->matrix == NULL) {
+            free(*image);
+            *image = NULL;
+            printf("Error: Not enough memory!");
+            return -1;
+        } else {
+            for (int i = 0; i < (*image)->height; i++) {
+                (*image)->matrix[i] = malloc(sizeof(*(*image)->matrix[i]) * (*image)->width);
+                if ((*image)->matrix[i] == NULL) {
+                    free(*image);
+                    *image = NULL;
+                    printf("Error: Not enough memory!");
+                    return -1;
+                }
+                for (int j = 0; j < (*image)->width; j++) {
+                    if (fscanf(file, "%hu", &((*image)->matrix[i][j].pixel)) != 1) {
+                        printf("Error: Your file is corrupted (pixels)");
+                        free(*image);
+                        free((*image)->matrix); //TODO: free recursif :)
+
+                        return -3;
+                    }
+                }
+            }
+        }
+
+
+
+    } else if (strcmp(extension, "PPM") == 0) {
+        (*image)->format = PPM; //On donne le format PPM a la structure
+
+        char magical[3];
+
+        if (fscanf(file, "%s", magical) != 1) {
+            return -3; //Le fichier est malforme
+        }
+
+        if (strcmp(magical, "P3") != 0) {
+            printf("Error: Your file is corrupted! (magical)");
+            return -3; //Le fichier est malforme
+        }
+
+        if (fscanf(file, "%hu %hu", &(*image)->height, &(*image)->width) != 2) {
+            printf("Error: Your file is corrupted (size)");
+            return -3; //Le fichier est malforme
+        }
+
+        if (fscanf(file, "%hu", &(*image)->limits) != 1) {
+            printf("Error: Your file is corrupted (Limits)");
+            return -3; //Le fichier est malforme
+        }
+
+        printf("%hu %hu", (*image)->height, (*image)->width);
+
+        (*image)->matrix = malloc(sizeof(*(*image)->matrix) * (*image)->height);
+
+        if ((*image)->matrix == NULL) {
+            free(*image);
+            *image = NULL;
+            printf("Error: Not enough memory!");
+            return -1;
+        } else {
+            for (int i = 0; i < (*image)->height; i++) {
+                (*image)->matrix[i] = malloc(sizeof(*(*image)->matrix[i]) * (*image)->width);
+                for (int j = 0; j < (*image)->width; j++) {
+                    if (fscanf(file, "%hu", &((*image)->matrix[i][j].pixel_rgb.red)) != 1) {
+                        printf("Error: Your file is corrupted (RED)");
+                        free(*image);
+                        free((*image)->matrix); //TODO: free recursif :)
+
+                        return -3;
+                    }
+                    if (fscanf(file, "%hu", &((*image)->matrix[i][j].pixel_rgb.green)) != 1) {
+                        printf("Error: Your file is corrupted (GREEN)");
+                        free(*image);
+                        free((*image)->matrix); //TODO: free recursif :)
+
+                        return -3;
+                    }
+                    if (fscanf(file, "%hu", &((*image)->matrix[i][j].pixel_rgb.blue)) != 1) {
+                        printf("Error: Your file is corrupted(BLUE)");
+                        free(*image);
+                        free((*image)->matrix); //TODO: free recursif :)
+
+                        return -3;
+                    }
+                }
+            }
+        }
+    }
 
     fclose(file);
     return 0;
@@ -132,7 +251,76 @@ int load_pnm(PNM **image, char *filename) {
 
 int write_pnm(PNM *image, char *filename) {
 
-    /* Insérez le code ici */
+    char *extension = get_extension(filename);
+    if (extension == NULL) {
+        printf("EXTENSION FAULT\n");
+        return -1;
+    }
+
+    if(strlen(filename) > FILENAME_MAX){
+        printf("Error: Your filename is to long!");
+        return -1;
+    }
+
+    FILE *file = fopen(filename, "w");
+
+    if(file == NULL){
+        printf("Error: Impossible to create %s", filename);
+        return -2;
+    }
+
+    if(image->format == PBM){
+        fprintf(file, "P1\n");
+        fprintf(file, "%hu %hu\n", image->height, image->width);
+
+
+
+        for(int i = 0; i < image->height; i++){
+            for(int j = 0; j < image->width; j++){
+                fprintf(file, "%hu ", image->matrix[i][j].pixel);
+                if(j%39 == 0){
+                    fprintf(file, "\n");
+                }
+            }
+        }
+
+        fclose(file);
+
+    }else if(image->format == PGM){
+        fprintf(file, "P2\n");
+        fprintf(file, "%hu %hu\n", image->height, image->width);
+        fprintf(file, "%hu\n", image->limits);
+
+
+        for(int i = 0; i < image->height; i++){
+            for(int j = 0; j < image->width; j++){
+                fprintf(file, "%hu ", image->matrix[i][j].pixel);
+                if(j%39 == 0){
+                    fprintf(file, "\n");
+                }
+            }
+        }
+
+        fclose(file);
+    }else if(image->format == PPM){
+        fprintf(file, "P3\n");
+        fprintf(file, "%hu %hu\n", image->height, image->width);
+        fprintf(file, "%hu\n", image->limits);
+
+
+        for(int i = 0; i < image->height; i++){
+            for(int j = 0; j < image->width; j++){
+                fprintf(file, "%hu ", image->matrix[i][j].pixel_rgb.red);
+                fprintf(file, "%hu ", image->matrix[i][j].pixel_rgb.green);
+                fprintf(file, "%hu ", image->matrix[i][j].pixel_rgb.blue);
+                if(j%39 == 0){
+                    fprintf(file, "\n");
+                }
+            }
+        }
+
+        fclose(file);
+    }
 
     return 0;
 }
