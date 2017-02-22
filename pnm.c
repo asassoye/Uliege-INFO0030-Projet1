@@ -99,24 +99,30 @@ int load_pnm(PNM **image, char *filename) {
         }
 
 
-        Pixel **loading = malloc(sizeof(*loading) * (*image)->height);
+        (*image)->matrix = malloc(sizeof(*(*image)->matrix) * (*image)->height);
 
-        if (loading == NULL) {
+        if ((*image)->matrix == NULL) {
+            free(*image);
+            *image = NULL;
             printf("Error: Not enough memory!");
             return -1;
         } else {
             for (int i = 0; i < (*image)->height; i++) {
-                loading[i] = malloc(sizeof(*loading[i]) * (*image)->width);
+                (*image)->matrix[i] = malloc(sizeof(*(*image)->matrix[i]) * (*image)->width);
                 for (int j = 0; j < (*image)->width; j++) {
-                    if (fscanf(file, "%hu", &(loading[i][j].pixel)) != 1) {
+                    if (fscanf(file, "%hu", &((*image)->matrix[i][j].pixel)) != 1) {
                         printf("Error: Your file is corrupted");
+                        free(*image);
+                        free((*image)->matrix); //TODO: free recursif :)
+
                         return -3;
                     }
                 }
             }
         }
 
-        (*image)->matrix = loading;
+
+
     }
 
 
