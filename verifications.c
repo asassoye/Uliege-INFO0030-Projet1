@@ -6,6 +6,14 @@
 #include <string.h>
 #include "verifications.h"
 
+#ifndef __ANSI_
+#define __ANSI_
+
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
+#endif
 
 char *get_extension(char *file){
     const char *extension = strchr(file, '.');
@@ -21,12 +29,10 @@ char *get_extension(char *file){
         }else if(strcmp(extension, ".PPM") == 0 || strcmp(extension, ".ppm") == 0){
             return "PPM";
         }else {
-            printf("Error: Your file must have PBM, PGM or PPM extension!");
             return NULL;
         }
     }
     else {
-        printf("Error: Please give a correct file\n");
         return NULL;
     }//end if-statement
 }
