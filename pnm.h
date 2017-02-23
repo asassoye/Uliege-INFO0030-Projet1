@@ -33,7 +33,7 @@ typedef union Pixel_t Pixel;
  */
 typedef enum Format_t {
     PBM, PGM, PPM
-}Format;
+} Format;
 
 /**
  * Déclaration du type opaque PNM
@@ -62,9 +62,7 @@ typedef struct PNM_t PNM;
  *    -4 Erreur diverse
  *
  */
-int load_pnm(PNM **image, char* filename);
-
-
+int load_pnm(PNM **image, char *filename);
 
 
 /**
@@ -84,7 +82,9 @@ int load_pnm(PNM **image, char* filename);
  *    -2 Erreur lors de la manipulation du fichier
  *
  */
-int write_pnm(PNM *image, char* filename);
+int write_pnm(PNM *image, char *filename);
+
+int free_matrix(Pixel **matrix, unsigned int columns);
 
 /**
  * help_pnm

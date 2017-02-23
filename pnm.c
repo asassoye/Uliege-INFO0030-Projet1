@@ -41,11 +41,10 @@ struct RGB_t {
  * Definition du type Pixel
  */
 
-    union Pixel_t{
-        unsigned short pixel;
-        RGB pixel_rgb;
-    };
-
+union Pixel_t {
+    unsigned short pixel;
+    RGB pixel_rgb;
+};
 
 
 /**
@@ -60,81 +59,57 @@ struct PNM_t {
 };
 
 static int create_pbm_matrix(PNM **image, FILE *file);
+
 static int create_pgm_matrix(PNM **image, FILE *file);
+
 static int create_ppm_matrix(PNM **image, FILE *file);
 
-static int create_pbm_matrix(PNM **image, FILE *file){
-    (*image)->format = PBM; //On donne le format PBM a la structure
+static int create_pbm_matrix(PNM **image, FILE *file) {
+    (*image)->format = PBM; //On donne le format PGM a la structure
 
     char magical[3];
-    char line[500];
-    do{
-        if(fgets(line, sizeof(line), file) == NULL){
-            return error(0x7CF); //Fichier malformé
-        }
-    }while(line[0] == '#');
 
-        if (sscanf(line, "%s", magical) != 1){
-            return error(0x7CF); //Fichier malformé
-        }
-        if (strcmp(magical, "P1") != 0) {
-            return error(0x7CF); //Fichier malformé
-        }
-
-
-    do{
-        if(fgets(line, sizeof(line), file) == NULL){
-            return error(0x7CF); //Fichier malformé
-        }
-    }while(line[0] == '#');
-    if (line[0] != '#'){
-        if (sscanf(line, "%hu %hu", &(*image)->height, &(*image)->width) != 2){
-            return error(0x7CF); //Fichier malformé
-        }
+    if (fscanf(file, "%s", magical) != 1) {
+        return error(0x7CF); //Fichier malformé
     }
+
+    if (strcmp(magical, "P1") != 0) {
+        return error(0x7CF); //Fichier malformé
+    }
+
+
+    if (fscanf(file, "%hu %hu", &(*image)->height, &(*image)->width) != 2) {
+        return error(0x7CF); //Fichier malformé
+    }
+
 
     (*image)->matrix = malloc(sizeof(*(*image)->matrix) * (*image)->height);
 
-    if ((*image)->matrix == 0) {
+    if ((*image)->matrix == NULL) {
         free(*image);
         *image = NULL;
-
-        return error(0x7CD); //Pas assez de memoire
-    }
-
-    do{
-        if(fgets(line, sizeof(line), file) == NULL){
-            return error(0x7CF); //Fichier malformé
-        }
-    }while(line[0] == '#');
-int j = 0;
-    for (int i = 0; i < (*image)->height; i++) {
-        int bytes_consumed = 0, bytes_now = 0;
-        (*image)->matrix[i] = malloc(sizeof(*(*image)->matrix[i]) * (*image)->width);
-        if ((*image)->matrix[i] == NULL){
-            printf("ERROR"); //TODO: Code erreur
-        }
-        j=0;
-        while (j < (*image)->width) {
-            if(sscanf(line + bytes_consumed, "%hu%n", &((*image)->matrix[i][j].pixel), &bytes_now) == EOF){
-                do{
-                    if(fgets(line, sizeof(line), file) == NULL){
-                        return error(0x7CF); //Fichier malformé
-                    }
-                }while(line[0] == '#');
-
-                bytes_consumed = 0;
-            }else {
-                bytes_consumed += bytes_now;
-                j++;
+        return error(0x7CD); //Pas assez de mémoire
+    } else {
+        for (int i = 0; i < (*image)->height; i++) {
+            (*image)->matrix[i] = malloc(sizeof(*(*image)->matrix[i]) * (*image)->width);
+            if ((*image)->matrix[i] == NULL) {
+                free_matrix((*image)->matrix, (*image)->width);
+                return error(0x7CD); //Pas assez de mémoire
             }
-        }//fin for j
-    } //fin for i
+            for (int j = 0; j < (*image)->width; j++) {
+                if (fscanf(file, "%hu", &((*image)->matrix[i][j].pixel)) != 1) {
 
+                    free_matrix((*image)->matrix, (*image)->width);
 
+                    return error(0x7CF); //Fichier malformé
+                }
+            }
+        }
+    }
     return 0;
 }
-static int create_pgm_matrix(PNM **image, FILE *file){
+
+static int create_pgm_matrix(PNM **image, FILE *file) {
     (*image)->format = PGM; //On donne le format PGM a la structure
 
     char magical[3];
@@ -144,18 +119,15 @@ static int create_pgm_matrix(PNM **image, FILE *file){
     }
 
     if (strcmp(magical, "P2") != 0) {
-        printf(ANSI_COLOR_RED "Error: Your file is corrupted! (Corresponding magical number)\n" ANSI_COLOR_RESET);
         return error(0x7CF); //Fichier malformé
     }
 
 
     if (fscanf(file, "%hu %hu", &(*image)->height, &(*image)->width) != 2) {
-        printf(ANSI_COLOR_RED "Error: Your file is corrupted! (Impossible to define dimensions)\n" ANSI_COLOR_RESET);
         return error(0x7CF); //Fichier malformé
     }
 
     if (fscanf(file, "%hu", &(*image)->limits) != 1) {
-        printf("Error: Your file is corrupted (limits)");
         return error(0x7CF); //Fichier malformé
     }
 
@@ -169,15 +141,13 @@ static int create_pgm_matrix(PNM **image, FILE *file){
         for (int i = 0; i < (*image)->height; i++) {
             (*image)->matrix[i] = malloc(sizeof(*(*image)->matrix[i]) * (*image)->width);
             if ((*image)->matrix[i] == NULL) {
-                free(*image);
-                *image = NULL;
+                free_matrix((*image)->matrix, (*image)->width);
                 return error(0x7CD); //Pas assez de mémoire
             }
             for (int j = 0; j < (*image)->width; j++) {
                 if (fscanf(file, "%hu", &((*image)->matrix[i][j].pixel)) != 1) {
 
-                    free(*image);
-                    free((*image)->matrix); //TODO: free recursif :)
+                    free_matrix((*image)->matrix, (*image)->width);
 
                     return error(0x7CF); //Fichier malformé
                 }
@@ -186,7 +156,8 @@ static int create_pgm_matrix(PNM **image, FILE *file){
     }
     return 0;
 }
-static int create_ppm_matrix(PNM **image, FILE *file){
+
+static int create_ppm_matrix(PNM **image, FILE *file) {
     (*image)->format = PPM; //On donne le format PPM a la structure
 
     char magical[3];
@@ -196,17 +167,14 @@ static int create_ppm_matrix(PNM **image, FILE *file){
     }
 
     if (strcmp(magical, "P3") != 0) {
-        printf("Error: Your file is corrupted! (magical)");
         return error(0x7CF); //Fichier malformé
     }
 
     if (fscanf(file, "%hu %hu", &(*image)->height, &(*image)->width) != 2) {
-        printf("Error: Your file is corrupted (size)");
         return error(0x7CF); //Fichier malformé
     }
 
     if (fscanf(file, "%hu", &(*image)->limits) != 1) {
-        printf("Error: Your file is corrupted (Limits)");
         return error(0x7CF); //Fichier malformé
     }
 
@@ -222,20 +190,17 @@ static int create_ppm_matrix(PNM **image, FILE *file){
             (*image)->matrix[i] = malloc(sizeof(*(*image)->matrix[i]) * (*image)->width);
             for (int j = 0; j < (*image)->width; j++) {
                 if (fscanf(file, "%hu", &((*image)->matrix[i][j].pixel_rgb.red)) != 1) {
-                    free(*image);
-                    free((*image)->matrix); //TODO: free recursif :)
+                    free_matrix((*image)->matrix, (*image)->width);
 
                     return error(0x7CF); //Fichier malformé
                 }
                 if (fscanf(file, "%hu", &((*image)->matrix[i][j].pixel_rgb.green)) != 1) {
-                    free(*image);
-                    free((*image)->matrix); //TODO: free recursif :)
+                    free_matrix((*image)->matrix, (*image)->width);
 
                     return error(0x7CF); //Fichier malformé
                 }
                 if (fscanf(file, "%hu", &((*image)->matrix[i][j].pixel_rgb.blue)) != 1) {
-                    free(*image);
-                    free((*image)->matrix); //TODO: free recursif :)
+                    free_matrix((*image)->matrix, (*image)->width);
 
                     return error(0x7CF); //Fichier malformé
                 }
@@ -245,11 +210,19 @@ static int create_ppm_matrix(PNM **image, FILE *file){
     return 0;
 }
 
+/************
+ *
+ * KORIAN:
+ * NE GERE PAS ENCORE LES LIGNES A IGNORER (# Commentaire)
+ * FICHIER DOIT SE TROUVER DANS LE MEME REPERTOIRE
+ * (TEMPORAIRE)
+ *
+ **********/
 int load_pnm(PNM **image, char *filename) {
     /*
      * Verifie si l'utilisateur a utilisé un caractere non-autorisé dans le nom du fichier
      */
-    if(verify_illegal_caracters(filename) != 0){
+    if (verify_illegal_caracters(filename) != 0) {
         return error(0x7D3); // Utilisation d'un caractere illegal
     }
 
@@ -305,7 +278,7 @@ int write_pnm(PNM *image, char *filename) {
     /*
      * On verifie si l'utilisateur n'utilise pas des caracteres illegals dans le nom du fichier
      */
-    if(verify_illegal_caracters(filename) != 0){
+    if (verify_illegal_caracters(filename) != 0) {
         return error(0x7D3); // Utilisation d'un caractere illegal
     }
 
@@ -317,7 +290,7 @@ int write_pnm(PNM *image, char *filename) {
     if (extension == NULL) {
         return error(0x7D0); //Mauvaise extension
     }
-    if(verify_type(image->format, extension) != 0){
+    if (verify_type(image->format, extension) != 0) {
         return error(0x7D4);
     }
 
@@ -341,10 +314,10 @@ int write_pnm(PNM *image, char *filename) {
      * On ecrit le fichier par rapport a son format
      */
     if (image->format == PBM) {
-        if(fprintf(file, "%s", "P1\n") <= 0){
+        if (fprintf(file, "%s", "P1\n") <= 0) {
             return error(0x7D5); //Impossible d'ecrire le fichier
         }
-        if(fprintf(file, "%hu %hu\n", image->height, image->width) <= 0){
+        if (fprintf(file, "%hu %hu\n", image->height, image->width) <= 0) {
             return error(0x7D5); //Impossible d'ecrire le fichier
         }
 
@@ -354,7 +327,7 @@ int write_pnm(PNM *image, char *filename) {
                 /*
                  * On ecrit le pixel et on renvoi une erreur si il y a eu un probleme
                  */
-                if(fprintf(file, "%hu ", image->matrix[i][j].pixel) <= 0){
+                if (fprintf(file, "%hu ", image->matrix[i][j].pixel) <= 0) {
                     return error(0x7D5); //Impossible d'ecrire le fichier
                 }
 
@@ -409,13 +382,19 @@ int write_pnm(PNM *image, char *filename) {
     return 0;
 }
 
-
+int free_matrix(Pixel **matrix, unsigned int columns) {
+    for (unsigned int i = 0; i < columns; i++)
+        free(matrix[i]);
+    free(matrix);
+    matrix = NULL;
+    return 0;
+}
 
 void help_pnm(void) {
     printf(ANSI_COLOR_CYAN "Usage:\n" ANSI_COLOR_RESET);
-    printf("\tcommand [options] [arguments] filepath\n\n");
+    printf("\t./pnm [options] [arguments] filepath\n\n");
     printf(ANSI_COLOR_CYAN "Options:\n" ANSI_COLOR_RESET);
     printf(ANSI_COLOR_GREEN "\t-h" ANSI_COLOR_RESET "\t Display this help message\n");
     printf(ANSI_COLOR_GREEN "\t-f" ANSI_COLOR_RESET "\t Format used (PBM, PGM or PPM)\n\n");
-
 }
+

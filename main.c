@@ -14,11 +14,12 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-//#include <ctype.h>
-//#include <getopt.h>
+#include <ctype.h>
+#include <getopt.h>
 
 #include "pnm.h"
 #include "verifications.h"
+#include "error.h"
 
 #ifndef __ANSI_
 #define __ANSI_
@@ -44,8 +45,23 @@ int main(int argc, char **argv) {
                 help_pnm();
                 return 0;
             case 'f':
+                if(strcmp(optarg, "PBM") == 0){
+                    if(verify_type(PBM, get_extension(argv[argc - 1])) != 0){
+                        return error(0x7D6);
+                    }
+                }else if(strcmp(optarg, "PGM") == 0){
+                    if(verify_type(PGM, get_extension(argv[argc - 1])) != 0){
+                        return error(0x7D6);
+                    }
+                }else if(strcmp(optarg, "PPM") == 0){
+                    if(verify_type(PPM, get_extension(argv[argc - 1])) != 0){
+                        return error(0x7D6);
+                    }
+                }
+
+
                 printf(ANSI_COLOR_CYAN "Loading file...\n\n" ANSI_COLOR_RESET);
-                if(load_pnm(&image, argv[argc-1]) != 0){
+                if (load_pnm(&image, argv[argc - 1]) != 0) {
                     return -1;
                 }
                 printf(ANSI_COLOR_GREEN "File correctly load in memory!\n\n" ANSI_COLOR_RESET);
@@ -53,21 +69,19 @@ int main(int argc, char **argv) {
                 char save;
 
 
-                    printf("Do you want to save the loaded image?[y,n]");
-                    //scanf("%c", &save);
-                save = 'y';
-                    printf("\n");
+                printf("Do you want to save the loaded image?[y,n]");
+                scanf("%c", &save);
+                printf("\n");
 
 
-                if(save == 'y'){
+                if (save == 'y') {
                     char filename[FILENAME_MAX];
                     printf("Which name do you want to give to your file?");
-                    //scanf("%s", filename);
-                    strcpy(filename, "test.pbm");
+                    scanf("%s", filename);
                     printf("\n");
-                    if(write_pnm(image, filename) == 0){
+                    if (write_pnm(image, filename) == 0) {
                         printf(ANSI_COLOR_GREEN "File correctly saved!\n\n" ANSI_COLOR_RESET);
-                    }else {
+                    } else {
                         return -1;
                     }
                 }

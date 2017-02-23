@@ -38,10 +38,10 @@
  */
 static void error_print(char *error);
 
-int error(int code){
+int error(int code) {
     assert(code != 0);
 
-    switch(code){
+    switch (code) {
         case 0x7CC:
             error_print("Error 0x7CC: Your import file must have PBM, PGM or PPM extension!");
             return -2;
@@ -72,13 +72,16 @@ int error(int code){
         case 0x7D5:
             error_print("Error 0x7D5: Impossible to write file");
             return -2;
+        case 0x7D6:
+            error_print("Error 0x7D6: Your format is not the same as the file extension!");
+            return -1;
         default:
             error_print("Error!");
             return -4;
     }
 }
 
-static void error_print(char *error){
+static void error_print(char *error) {
     assert(error != NULL);
     printf(ANSI_COLOR_RED "%s\n\n" ANSI_COLOR_RESET, error);
 }
