@@ -1,7 +1,7 @@
 ### 
 ## Makefile skeleton
 ## INFO0030: Projet 1
-## 
+## Andrew Sassoye
 ### 
 
 ## Variables
@@ -14,8 +14,8 @@ LDFLAGS=
 
 # Files
 EXEC=pnm
-MODULES=main.c pnm.c
-OBJECTS=main.o pnm.o
+MODULES=main.c pnm.c verifications.c error.c
+OBJECTS=main.o pnm.o verifications.o error.o
 
 ## Rules
 

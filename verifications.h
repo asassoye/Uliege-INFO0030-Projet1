@@ -5,8 +5,12 @@
 #ifndef __VERIFICATIONS_H__
 #define __VERIFICATIONS_H__
 
-int verify_type(char *type, char *file);
+#include "pnm.h"
+
+int verify_type(Format format, char *extension);
 
 char *get_extension(char *file);
+
+int verify_illegal_caracters(char *filename);
 
 #endif //__VERIFICATIONS_H__

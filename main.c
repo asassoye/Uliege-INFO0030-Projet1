@@ -5,7 +5,7 @@
  * de fichiers pnm.
  *
  * @author: Sassoye Andrew 20160315
- * @date:
+ * @date: 23/02/2017
  * @projet: INFO0030 Projet 1
  */
 
@@ -13,8 +13,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
-#include <ctype.h>
-#include <getopt.h>
+#include <string.h>
+//#include <ctype.h>
+//#include <getopt.h>
 
 #include "pnm.h"
 #include "verifications.h"
@@ -30,7 +31,6 @@
 #endif
 
 int main(int argc, char **argv) {
-
     const char *optstring = ":hf::";
     int option;
 
@@ -54,14 +54,16 @@ int main(int argc, char **argv) {
 
 
                     printf("Do you want to save the loaded image?[y,n]");
-                    scanf("%c", &save);
+                    //scanf("%c", &save);
+                save = 'y';
                     printf("\n");
 
 
                 if(save == 'y'){
                     char filename[FILENAME_MAX];
                     printf("Which name do you want to give to your file?");
-                    scanf("%s", filename);
+                    //scanf("%s", filename);
+                    strcpy(filename, "test.pbm");
                     printf("\n");
                     if(write_pnm(image, filename) == 0){
                         printf(ANSI_COLOR_GREEN "File correctly saved!\n\n" ANSI_COLOR_RESET);
