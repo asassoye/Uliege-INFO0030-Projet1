@@ -45,21 +45,6 @@ int main(int argc, char **argv) {
                 help_pnm();
                 return 0;
             case 'f':
-                if(strcmp(optarg, "PBM") == 0){
-                    if(verify_type(PBM, get_extension(argv[argc - 1])) != 0){
-                        return error(0x7D6);
-                    }
-                }else if(strcmp(optarg, "PGM") == 0){
-                    if(verify_type(PGM, get_extension(argv[argc - 1])) != 0){
-                        return error(0x7D6);
-                    }
-                }else if(strcmp(optarg, "PPM") == 0){
-                    if(verify_type(PPM, get_extension(argv[argc - 1])) != 0){
-                        return error(0x7D6);
-                    }
-                }
-
-
                 printf(ANSI_COLOR_CYAN "Loading file...\n\n" ANSI_COLOR_RESET);
                 if (load_pnm(&image, argv[argc - 1]) != 0) {
                     return -1;
