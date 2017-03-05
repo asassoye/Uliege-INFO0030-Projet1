@@ -4,7 +4,7 @@
  * Ce fichier contient les déclarations de types et les prototypes
  * des fonctions pour la manipulation d'images PNM.
  * 
- * @author: Nom Prenom Matricule
+ * @author: Sassoye Andrew 20160135
  * @date: 
  * @projet: INFO0030 Projet 1
  */
@@ -23,7 +23,7 @@
 typedef struct RGB_t RGB;
 
 /**
- * Déclaration du type opaque Pixel
+ * Déclaration du type union Pixel
  *
  */
 typedef union Pixel_t Pixel;
@@ -84,6 +84,20 @@ int load_pnm(PNM **image, char *filename);
  */
 int write_pnm(PNM *image, char *filename);
 
+/**
+ * free_matrix
+ *
+ * Libere la memoire d'une matrice
+ *
+ * @param matrix un pointeur sur la matrice
+ * @param columns le nombre de colonnes de la matrice
+ *
+ * @pre: matrix != NULL, columns > 0
+ * @post: a liberé la memoire de la matrice
+ *
+ * @return:
+ *      0 Succes
+ */
 int free_matrix(Pixel **matrix, unsigned int columns);
 
 /**

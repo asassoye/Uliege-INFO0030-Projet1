@@ -1,6 +1,13 @@
-//
-// Created by Andrew Sassoye on 20/02/17.
-//
+/**
+ * verifications.c
+ *
+ * Ce fichier contient les définitions de types et
+ * les fonctions de manipulation des verifications
+ *
+ * @author: Sassoye Andrew 20160135
+ * @date: 23/02/2017
+ * @projet: INFO0030 Projet 1
+ */
 
 #include <stdio.h>
 #include <string.h>

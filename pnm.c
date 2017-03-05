@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "pnm.h"
 #include "verifications.h"
@@ -26,6 +27,92 @@
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 #endif
+
+/**
+ * create_pbm_matrix
+ *
+ * Charge un fichier PBM en memoire
+ *
+ * @param image l'adresse d'un pointeur sur PNM à laquelle écrire l'adresse
+ *              de l'image chargée.
+ * @param file le pointeur vers le fichier en memoire
+ *
+ * @pre: image != NULL, filename != NULL
+ * @post: Le fichier est chargé dans la memoire
+ *
+ * @return:
+ *     0 Succès
+ *    -1 Erreur à l'allocation de mémoire
+ *    -2 Nom du fichier malformé
+ *    -3 Contenu du fichier malformé
+ *    -4 Erreur diverse
+ *
+ */
+static int create_pbm_matrix(PNM **image, FILE *file);
+
+/**
+ * create_pgm_matrix
+ *
+ * Charge un fichier PGM en memoire
+ *
+ * @param image l'adresse d'un pointeur sur PNM à laquelle écrire l'adresse
+ *              de l'image chargée.
+ * @param file le pointeur vers le fichier en memoire
+ *
+ * @pre: image != NULL, filename != NULL
+ * @post: Le fichier est chargé dans la memoire
+ *
+ * @return:
+ *     0 Succès
+ *    -1 Erreur à l'allocation de mémoire
+ *    -2 Nom du fichier malformé
+ *    -3 Contenu du fichier malformé
+ *    -4 Erreur diverse
+ *
+ */
+static int create_pgm_matrix(PNM **image, FILE *file);
+
+/**
+ * create_ppm_matrix
+ *
+ * Charge un fichier PPM en memoire
+ *
+ * @param image l'adresse d'un pointeur sur PNM à laquelle écrire l'adresse
+ *              de l'image chargée.
+ * @param file le pointeur vers le fichier en memoire
+ *
+ * @pre: image != NULL, filename != NULL
+ * @post: Le fichier est chargé dans la memoire
+ *
+ * @return:
+ *     0 Succès
+ *    -1 Erreur à l'allocation de mémoire
+ *    -2 Nom du fichier malformé
+ *    -3 Contenu du fichier malformé
+ *    -4 Erreur diverse
+ *
+ */
+static int create_ppm_matrix(PNM **image, FILE *file);
+
+/**
+ * ignore_comment
+ *
+ * Verifie si un commentaire est présent et si cest le cas, lit le commentaire complet
+ *
+ * @param file le pointeur vers le fichier en memoire
+ *
+ * @pre: image != NULL, filename != NULL
+ * @post: Le fichier est chargé dans la memoire
+ *
+ * @return:
+ *     0 Succès
+ *    -1 Erreur à l'allocation de mémoire
+ *    -2 Nom du fichier malformé
+ *    -3 Contenu du fichier malformé
+ *    -4 Erreur diverse
+ *
+ */
+static int ignore_comment(FILE *file);
 
 
 /**
@@ -58,16 +145,14 @@ struct PNM_t {
     Pixel **matrix;
 };
 
-static int create_pbm_matrix(PNM **image, FILE *file);
 
-static int create_pgm_matrix(PNM **image, FILE *file);
-
-static int create_ppm_matrix(PNM **image, FILE *file);
 
 static int create_pbm_matrix(PNM **image, FILE *file) {
     (*image)->format = PBM; //On donne le format PGM a la structure
 
     char magical[3];
+
+    ignore_comment(file);
 
     if (fscanf(file, "%s", magical) != 1) {
         return error(0x7CF); //Fichier malformé
@@ -77,11 +162,13 @@ static int create_pbm_matrix(PNM **image, FILE *file) {
         return error(0x7CF); //Fichier malformé
     }
 
+    ignore_comment(file);
 
     if (fscanf(file, "%hu %hu", &(*image)->height, &(*image)->width) != 2) {
         return error(0x7CF); //Fichier malformé
     }
 
+    ignore_comment(file);
 
     (*image)->matrix = malloc(sizeof(*(*image)->matrix) * (*image)->height);
 
@@ -114,7 +201,9 @@ static int create_pgm_matrix(PNM **image, FILE *file) {
 
     char magical[3];
 
-    if (fscanf(file, "%s", magical) != 1) {
+    ignore_comment(file);
+
+    if (fscanf(file, "%s\n", magical) != 1) {
         return error(0x7CF); //Fichier malformé
     }
 
@@ -123,13 +212,19 @@ static int create_pgm_matrix(PNM **image, FILE *file) {
     }
 
 
+    ignore_comment(file);
+
     if (fscanf(file, "%hu %hu", &(*image)->height, &(*image)->width) != 2) {
         return error(0x7CF); //Fichier malformé
     }
 
+    ignore_comment(file);
+
     if (fscanf(file, "%hu", &(*image)->limits) != 1) {
         return error(0x7CF); //Fichier malformé
     }
+
+    ignore_comment(file);
 
     (*image)->matrix = malloc(sizeof(*(*image)->matrix) * (*image)->height);
 
@@ -162,21 +257,32 @@ static int create_ppm_matrix(PNM **image, FILE *file) {
 
     char magical[3];
 
-    if (fscanf(file, "%s", magical) != 1) {
+    ignore_comment(file);
+
+    if (fscanf(file, "%s\n", magical) != 1) {
         return error(0x7CF); //Fichier malformé
     }
+
+    ignore_comment(file);
 
     if (strcmp(magical, "P3") != 0) {
         return error(0x7CF); //Fichier malformé
     }
 
+    ignore_comment(file);
+
     if (fscanf(file, "%hu %hu", &(*image)->height, &(*image)->width) != 2) {
         return error(0x7CF); //Fichier malformé
     }
 
+    ignore_comment(file);
+
     if (fscanf(file, "%hu", &(*image)->limits) != 1) {
         return error(0x7CF); //Fichier malformé
     }
+
+
+    ignore_comment(file);
 
 
     (*image)->matrix = malloc(sizeof(*(*image)->matrix) * (*image)->height);
@@ -210,49 +316,47 @@ static int create_ppm_matrix(PNM **image, FILE *file) {
     return 0;
 }
 
-/************
- *
- * KORIAN:
- * NE GERE PAS ENCORE LES LIGNES A IGNORER (# Commentaire)
- * FICHIER DOIT SE TROUVER DANS LE MEME REPERTOIRE
- * (TEMPORAIRE)
- *
- **********/
+static int ignore_comment(FILE *file) {
+        assert(file != NULL);
+
+        char character = '\0';
+        if(fscanf(file, "#%c", &character) != 0){
+            while(character != '\n'){
+                fscanf(file, "%c", &character);
+            }
+            return -1;
+        }else {
+            return 0;
+        }
+
+}
+
+
 int load_pnm(PNM **image, char *filename) {
-    /*
-     * Verifie si l'utilisateur a utilisé un caractere non-autorisé dans le nom du fichier
-     */
+
     if (verify_illegal_caracters(filename) != 0) {
         return error(0x7D3); // Utilisation d'un caractere illegal
     }
 
-    /*
-     * Verifie l'extension et renvoi une erreur si elle n'est pas correcte
-     */
+
     char *extension = get_extension(filename);
     if (extension == NULL) {
         return error(0x7CC); //Mauvaise extension
     }
 
-    /*
-     * On essaye d'alouer de la memoire pour la strucure PNM, si ca ne fonctionne pas, on renvoi une erreur
-     */
+
     *image = malloc(sizeof(PNM));
     if (*image == NULL) {
         return error(0x7CD); //Pas assez de mémoire
     }
 
-    /*
-     * On ouvre le fichier donne et si on ne sait pas l'ouvir on envoi une erreur
-     */
+
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
         return error(0x7CE); // Chargement du fichier impossible
     }
 
-    /*
-     * Execute la fonction adequat par rapport au format pour creer la matrice de l'image
-     */
+
     int result;
     if (strcmp(extension, "PBM") == 0) {
         result = create_pbm_matrix(image, file);
@@ -267,25 +371,18 @@ int load_pnm(PNM **image, char *filename) {
         if (result != 0) return result;
     }
 
-    /*
-     * On ferme le fichier et on renvoi que tout s'est bien passé!
-     */
+
     fclose(file);
     return 0;
 }
 
 int write_pnm(PNM *image, char *filename) {
-    /*
-     * On verifie si l'utilisateur n'utilise pas des caracteres illegals dans le nom du fichier
-     */
+
     if (verify_illegal_caracters(filename) != 0) {
         return error(0x7D3); // Utilisation d'un caractere illegal
     }
 
-    /*
-     * On recupere l'extension du nom du fichier et on verifie si il correspond avec le format
-     * qu'on essaye d'enregister. Dans le cas contraire on renvoi une erreur
-     */
+
     char *extension = get_extension(filename);
     if (extension == NULL) {
         return error(0x7D0); //Mauvaise extension
@@ -294,25 +391,19 @@ int write_pnm(PNM *image, char *filename) {
         return error(0x7D4);
     }
 
-    /*
-     * On verifie qu'on essaye pas de donner un nom trop long au fichier
-     */
+
     if (strlen(filename) > FILENAME_MAX) {
         return error(0x7D0); //Nom de fichier trop long
     }
 
-    /*
-     * On creer le fichier vide, si il y a une erreur, on l'affice a l'ecran
-     */
+
     FILE *file = fopen(filename, "w");
 
     if (file == NULL) {
         return error(0x7D2); //Imopssible de creer le fichier
     }
 
-    /*
-     * On ecrit le fichier par rapport a son format
-     */
+
     if (image->format == PBM) {
         if (fprintf(file, "%s", "P1\n") <= 0) {
             return error(0x7D5); //Impossible d'ecrire le fichier
@@ -324,16 +415,12 @@ int write_pnm(PNM *image, char *filename) {
         int k = 0;
         for (int i = 0; i < image->height; i++) {
             for (int j = 0; j < image->width; j++) {
-                /*
-                 * On ecrit le pixel et on renvoi une erreur si il y a eu un probleme
-                 */
+
                 if (fprintf(file, "%hu ", image->matrix[i][j].pixel) <= 0) {
                     return error(0x7D5); //Impossible d'ecrire le fichier
                 }
 
-                /*
-                 * On evite les lignes trop longues
-                 */
+
                 k++;
                 if (k % 39 == 0) {
                     fprintf(file, "\n");
@@ -375,9 +462,6 @@ int write_pnm(PNM *image, char *filename) {
         }
     }
 
-    /*
-     * On ferme le fichier et on renvoi un OK :)
-     */
     fclose(file);
     return 0;
 }

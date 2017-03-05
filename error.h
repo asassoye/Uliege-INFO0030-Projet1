@@ -1,6 +1,13 @@
-//
-// Created by Andrew Sassoye on 22/02/17.
-//
+/**
+ * error.h
+ *
+ * Ce fichier contient les déclarations de types et les prototypes
+ * des fonctions d'erreur
+ *
+ * @author: Sassoye Andrew 20160135
+ * @date:
+ * @projet: INFO0030 Projet 1
+ */
 
 #ifndef __ERROR_H__
 #define __ERROR_H__
